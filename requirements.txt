@@ -1,0 +1,14 @@
+# pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+# pip uninstall onnxruntime onnxruntime-gpu
+# pip install onnxruntime-gpu --extra-index-url  https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-12/pypi/simple/
+
+# 模型下载地址：https://huggingface.co/datasets/Gourieff/ReActor/tree/main/models
+
+# pip install https://github.com/jloh02/dlib/releases/download/v19.22/dlib-19.22.99-cp310-cp310-win_amd64.whl
+
+numpy~=2.2.4
+opencv-python>=4.5.0
+insightface~=0.7.3
+tqdm>=4.62.0
+Pillow>=8.3.0
+face-recognition~=1.3.0

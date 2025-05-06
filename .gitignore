@@ -1,0 +1,4 @@
+.venv
+models
+**/output*
+**/input*
