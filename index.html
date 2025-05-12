@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaceSwap 视频人脸交换应用</title>
+    <style>
+        :root {
+            --primary-color: #4a86e8;
+            --secondary-color: #2a66c8;
+            --light-bg: #f5f5f5;
+            --dark-bg: #222222;
+            --text-color: #333333;
+            --light-text: #ffffff;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            color: var(--text-color);
+            background-color: var(--light-bg);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-brand i {
+            margin-right: 0.5rem;
+        }
+        
+        .navbar-nav {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-item {
+            margin-left: 1.5rem;
+        }
+        
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+        
+        .nav-link:hover {
+            opacity: 0.8;
+        }
+        
+        .navbar-toggler {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 5rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .hero-title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .btn {
+            display: inline-block;
+            font-weight: 500;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            user-select: none;
+            border: 1px solid transparent;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: 0.25rem;
+            transition: all 0.15s ease-in-out;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        .btn-lg {
+            padding: 0.75rem 1.5rem;
+            font-size: 1.25rem;
+            border-radius: 0.3rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .btn-light {
+            background-color: white;
+            border-color: white;
+            color: var(--primary-color);
+        }
+        
+        .btn-light:hover {
+            background-color: #f0f0f0;
+            border-color: #f0f0f0;
+        }
+        
+        .btn-outline-light {
+            background-color: transparent;
+            border-color: white;
+            color: white;
+        }
+        
+        .btn-outline-light:hover {
+            background-color: white;
+            color: var(--primary-color);
+        }
+        
+        .section-title {
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .mb-5 {
+            margin-bottom: 3rem;
+        }
+        
+        .mb-4 {
+            margin-bottom: 1.5rem;
+        }
+        
+        .mb-3 {
+            margin-bottom: 1rem;
+        }
+        
+        .me-3 {
+            margin-right: 1rem;
+        }
+        
+        .me-2 {
+            margin-right: 0.5rem;
+        }
+        
+        .mt-5 {
+            margin-top: 3rem;
+        }
+        
+        .mt-3 {
+            margin-top: 1rem;
+        }
+        
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-right: -15px;
+            margin-left: -15px;
+        }
+        
+        .col-md-4, .col-md-6, .col-lg-4, .col-lg-6, .col-lg-8 {
+            position: relative;
+            width: 100%;
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+        
+        .col-md-4 {
+            flex: 0 0 33.333333%;
+            max-width: 33.333333%;
+        }
+        
+        .col-md-6 {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+        
+        .col-lg-4 {
+            flex: 0 0 33.333333%;
+            max-width: 33.333333%;
+        }
+        
+        .col-lg-6 {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+        
+        .col-lg-8 {
+            flex: 0 0 66.666667%;
+            max-width: 66.666667%;
+        }
+        
+        .lead {
+            font-size: 1.25rem;
+            font-weight: 300;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .d-flex {
+            display: flex;
+        }
+        
+        .justify-content-center {
+            justify-content: center;
+        }
+        
+        .align-items-center {
+            align-items: center;
+        }
+        
+        .align-items-start {
+            align-items: flex-start;
+        }
+        
+        .feature-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            height: 100%;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .feature-title {
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+        
+        .demo-img {
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            max-width: 100%;
+            transition: transform 0.3s;
+        }
+        
+        .demo-img:hover {
+            transform: scale(1.02);
+        }
+        
+        .code-block {
+            background-color: var(--dark-bg);
+            color: var(--light-text);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+        }
+        
+        .tech-badge {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+            font-weight: bold;
+        }
+        
+        .footer {
+            background-color: var(--dark-bg);
+            color: var(--light-text);
+            padding: 3rem 0;
+            margin-top: 3rem;
+        }
+        
+        .footer a {
+            color: var(--light-text);
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            color: var(--primary-color);
+        }
+        
+        .face-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 60px;
+            object-fit: cover;
+            border: 3px solid var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .step-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .step-number {
+            background-color: var(--primary-color);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-right: 1rem;
+        }
+        
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+        
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+        }
+        
+        .card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            word-wrap: break-word;
+            background-color: #fff;
+            background-clip: border-box;
+            border: 1px solid rgba(0,0,0,.125);
+            border-radius: 0.25rem;
+            margin-bottom: 1rem;
+        }
+        
+        .card-img-top {
+            width: 100%;
+            border-top-left-radius: calc(0.25rem - 1px);
+            border-top-right-radius: calc(0.25rem - 1px);
+        }
+        
+        .card-body {
+            flex: 1 1 auto;
+            padding: 1.25rem;
+        }
+        
+        .card-title {
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .card-header {
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 0;
+            background-color: rgba(0,0,0,.03);
+            border-bottom: 1px solid rgba(0,0,0,.125);
+        }
+        
+        .card-header:first-child {
+            border-radius: calc(0.25rem - 1px) calc(0.25rem - 1px) 0 0;
+        }
+        
+        .bg-primary {
+            background-color: var(--primary-color) !important;
+        }
+        
+        .text-white {
+            color: white !important;
+        }
+        
+        .text-success {
+            color: #28a745 !important;
+        }
+        
+        .text-primary {
+            color: var(--primary-color) !important;
+        }
+        
+        .text-dark {
+            color: var(--dark-bg) !important;
+        }
+        
+        .list-group {
+            display: flex;
+            flex-direction: column;
+            padding-left: 0;
+            margin-bottom: 0;
+            border-radius: 0.25rem;
+        }
+        
+        .list-group-item {
+            position: relative;
+            display: block;
+            padding: 0.75rem 1.25rem;
+            background-color: #fff;
+            border: 1px solid rgba(0,0,0,.125);
+        }
+        
+        .list-group-item:first-child {
+            border-top-left-radius: inherit;
+            border-top-right-radius: inherit;
+        }
+        
+        .list-group-item:last-child {
+            border-bottom-right-radius: inherit;
+            border-bottom-left-radius: inherit;
+        }
+        
+        .list-unstyled {
+            padding-left: 0;
+            list-style: none;
+        }
+        
+        .accordion {
+            overflow-anchor: none;
+        }
+        
+        .accordion-item {
+            background-color: #fff;
+            border: 1px solid rgba(0,0,0,.125);
+            margin-bottom: 0.5rem;
+            border-radius: 0.25rem;
+        }
+        
+        .accordion-header {
+            margin-bottom: 0;
+        }
+        
+        .accordion-button {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 1rem 1.25rem;
+            font-size: 1rem;
+            color: #212529;
+            text-align: left;
+            background-color: #fff;
+            border: 0;
+            border-radius: 0;
+            overflow-anchor: none;
+            cursor: pointer;
+        }
+        
+        .accordion-button:not(.collapsed) {
+            color: var(--primary-color);
+            background-color: rgba(74, 134, 232, 0.1);
+        }
+        
+        .accordion-button::after {
+            content: "+";
+            margin-left: auto;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .accordion-button:not(.collapsed)::after {
+            content: "-";
+        }
+        
+        .accordion-collapse {
+            display: none;
+        }
+        
+        .accordion-collapse.show {
+            display: block;
+        }
+        
+        .accordion-body {
+            padding: 1rem 1.25rem;
+        }
+        
+        .img-fluid {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        /* 图标样式 */
+        .bi {
+            display: inline-block;
+            font-style: normal;
+            font-weight: normal;
+            font-variant: normal;
+            text-transform: none;
+            line-height: 1;
+            vertical-align: -0.125em;
+        }
+        
+        .bi-camera-video::before {
+            content: "📹";
+        }
+        
+        .bi-download::before {
+            content: "⬇️";
+        }
+        
+        .bi-play-circle::before {
+            content: "▶️";
+        }
+        
+        .bi-people::before {
+            content: "👥";
+        }
+        
+        .bi-upload::before {
+            content: "📤";
+        }
+        
+        .bi-record-circle::before {
+            content: "⏺️";
+        }
+        
+        .bi-camera::before {
+            content: "📷";
+        }
+        
+        .bi-fullscreen::before {
+            content: "🔍";
+        }
+        
+        .bi-check-circle-fill::before {
+            content: "✅";
+        }
+        
+        .bi-info-circle::before {
+            content: "ℹ️";
+        }
+        
+        .bi-lightbulb::before {
+            content: "💡";
+        }
+        
+        .bi-bug::before {
+            content: "🐞";
+        }
+        
+        .bi-code-slash::before {
+            content: "💻";
+        }
+        
+        .bi-file-text::before {
+            content: "📄";
+        }
+        
+        .bi-envelope-fill::before {
+            content: "✉️";
+        }
+        
+        .bi-github::before {
+            content: "🐱";
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 992px) {
+            .col-lg-4, .col-lg-6, .col-lg-8 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .col-md-4, .col-md-6 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+            
+            .navbar-nav {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                margin-top: 1rem;
+            }
+            
+            .navbar-nav.show {
+                display: flex;
+            }
+            
+            .nav-item {
+                margin-left: 0;
+                margin-bottom: 0.5rem;
+            }
+            
+            .navbar-toggler {
+                display: block;
+            }
+            
+            .navbar-container {
+                flex-wrap: wrap;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="container navbar-container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-camera-video"></i> FaceSwap
+            </a>
+            <button class="navbar-toggler" onclick="toggleMenu()">
+                <span>☰</span>
+            </button>
+            <ul class="navbar-nav" id="navbarNav">
+                <li class="nav-item">
+                    <a class="nav-link" href="#features">功能特点</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#demo">演示效果</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#installation">安装说明</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#usage">使用方法</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#tech">技术实现</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#faq">常见问题</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 英雄区域 -->
+    <section class="hero-section">
+        <div class="container text-center">
+            <h1 class="hero-title">FaceSwap 视频人脸交换应用</h1>
+            <p class="hero-subtitle">基于深度学习的实时人脸交换技术，让你轻松体验换脸乐趣</p>
+            <div class="d-flex justify-content-center">
+                <a href="#installation" class="btn btn-light btn-lg me-3">
+                    <i class="bi bi-download"></i> 立即安装
+                </a>
+                <a href="#demo" class="btn btn-outline-light btn-lg">
+                    <i class="bi bi-play-circle"></i> 查看演示
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 项目简介 -->
+    <section class="container mb-5">
+        <h2 class="section-title">项目简介</h2>
+        <div class="row">
+            <div class="col-lg-8">
+                <p class="lead">
+                    FaceSwap是一个基于Python和PyQt5开发的实时人脸交换应用，利用先进的深度学习技术，可以在视频流中实时替换人脸。该应用提供了直观的图形用户界面，使用户能够轻松地进行人脸交换操作，并支持视频录制和截图功能。
+                </p>
+            </div>
+            <div class="col-lg-4 text-center">
+                <img src="demo/demo_cover.png" alt="应用界面预览" class="img-fluid demo-img">
+            </div>
+        </div>
+    </section>
+
+    <!-- 功能特点 -->
+    <section id="features" class="container mb-5">
+        <h2 class="section-title">功能特点</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-camera-video"></i>
+                    </div>
+                    <h3 class="feature-title">实时人脸交换</h3>
+                    <p>通过摄像头实时捕捉并替换视频流中的人脸，提供流畅的换脸体验</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <h3 class="feature-title">预设人脸选择</h3>
+                    <p>内置多个预设人脸（马保国、马斯克、赵丽颖），一键选择即可使用</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-upload"></i>
+                    </div>
+                    <h3 class="feature-title">自定义人脸上传</h3>
+                    <p>支持上传自定义人脸图片作为替换源，满足个性化需求</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-record-circle"></i>
+                    </div>
+                    <h3 class="feature-title">视频录制</h3>
+                    <p>可录制人脸交换后的视频并保存，方便分享和回顾</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-camera"></i>
+                    </div>
+                    <h3 class="feature-title">截图功能</h3>
+                    <p>支持拍摄当前画面并保存为图片，捕捉精彩瞬间</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-fullscreen"></i>
+                    </div>
+                    <h3 class="feature-title">全屏预览</h3>
+                    <p>支持全屏模式查看效果，获得更沉浸的体验</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 预设人脸展示 -->
+    <section class="container mb-5">
+        <h3 class="section-title">预设人脸</h3>
+        <div class="row text-center">
+            <div class="col-md-4 mb-4">
+                <img src="face_photos/mabaoguo.jpg" alt="马保国" class="face-avatar">
+                <h4>马保国</h4>
+            </div>
+            <div class="col-md-4 mb-4">
+                <img src="face_photos/musk.jpeg" alt="马斯克" class="face-avatar">
+                <h4>马斯克</h4>
+            </div>
+            <div class="col-md-4 mb-4">
+                <img src="face_photos/zhaoliying.jpeg" alt="赵丽颖" class="face-avatar">
+                <h4>赵丽颖</h4>
+            </div>
+        </div>
+    </section>
+
+    <!-- 演示效果 -->
+    <section id="demo" class="container mb-5">
+        <h2 class="section-title">演示效果</h2>
+        
+        <h3 class="mb-4">视频演示</h3>
+        <div class="video-container">
+            <iframe src="https://github.com/user-attachments/assets/a5399219-1327-4b59-8a2e-30608559fe56" frameborder="0" allowfullscreen></iframe>
+        </div>
+        
+        <h3 class="mb-4">截图展示</h3>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="demo/demo_photo_1.jpg" class="card-img-top" alt="马保国人脸交换">
+                    <div class="card-body">
+                        <h5 class="card-title">马保国人脸交换</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="demo/demo_photo_2.jpg" class="card-img-top" alt="马斯克人脸交换">
+                    <div class="card-body">
+                        <h5 class="card-title">马斯克人脸交换</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="demo/demo_photo_3.jpg" class="card-img-top" alt="赵丽颖人脸交换">
+                    <div class="card-body">
+                        <h5 class="card-title">赵丽颖人脸交换</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 安装说明 -->
+    <section id="installation" class="container mb-5">
+        <h2 class="section-title">安装说明</h2>
+        
+        <h3 class="mb-4">环境要求</h3>
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <ul class="list-group">
+                    <li class="list-group-item d-flex align-items-center">
+                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                        Python 3.7+
+                    </li>
+                    <li class="list-group-item d-flex align-items-center">
+                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                        OpenCV
+                    </li>
+                    <li class="list-group-item d-flex align-items-center">
+                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                        PyQt5
+                    </li>
+                    <li class="list-group-item d-flex align-items-center">
+                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                        InsightFace
+                    </li>
+                    <li class="list-group-item d-flex align-items-center">
+                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                        NumPy
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <i class="bi bi-info-circle me-2"></i>硬件推荐
+                    </div>
+                    <div class="card-body">
+                        <p>为了获得最佳体验，我们推荐以下硬件配置：</p>
+                        <ul>
+                            <li>CPU: Intel i5 或更高</li>
+                            <li>内存: 8GB 或更高</li>
+                            <li>显卡: 支持CUDA的NVIDIA显卡（可选，但能显著提升性能）</li>
+                            <li>摄像头: 720p或更高分辨率</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <h3 class="mb-4">安装步骤</h3>
+        <div class="step-card d-flex align-items-start mb-3">
+            <div class="step-number">1</div>
+            <div>
+                <h4>克隆仓库到本地</h4>
+                <div class="code-block">
+                    <code>git clone https://github.com/elon-zz/BigDataCourse-FaceSwapVideo.git<br>cd FaceSwapVideo</code>
+                </div>
+            </div>
+        </div>
+        
+        <div class="step-card d-flex align-items-start mb-3">
+            <div class="step-number">2</div>
+            <div>
+                <h4>安装依赖</h4>
+                <div class="code-block">
+                    <code>pip install -r requirements.txt</code>
+                </div>
+            </div>
+        </div>
+        
+        <div class="step-card d-flex align-items-start mb-3">
+            <div class="step-number">3</div>
+            <div>
+                <h4>下载模型文件</h4>
+                <p>从 <a href="https://huggingface.co/datasets/Gourieff/ReActor/tree/main/models" target="_blank">Hugging Face</a> 下载 <code>inswapper_128.onnx</code> 模型文件，并将其放置在 <code>models</code> 目录下。</p>
+                <div class="code-block">
+                    <code>mkdir -p models<br># 下载模型文件并放入models目录</code>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 使用方法 -->
+    <section id="usage" class="container mb-5">
+        <h2 class="section-title">使用方法</h2>
+        
+        <div class="step-card d-flex align-items-start mb-3">
+            <div class="step-number">1</div>
+            <div>
+                <h4>启动应用</h4>
+                <div class="code-block">
+                    <code>cd face_swap_ui<br>python main.py</code>
+                </div>
+            </div>
+        </div>
+        
+        <div class="step-card d-flex align-items-start mb-3">
+            <div class="step-number">2</div>
+            <div>
+                <h4>使用步骤</h4>
+                <ul class="list-group">
+                    <li class="list-group-item">从右侧选择一个预设人脸或上传自定义人脸</li>
+                    <li class="list-group-item">点击"启动摄像头"按钮开始实时人脸交换</li>
+                    <li class="list-group-item">可以点击"开始录制"按钮录制视频</li>
+                    <li class="list-group-item">可以点击"拍摄截图"按钮保存当前画面</li>
+                    <li class="list-group-item">录制的视频保存在output_videos目录</li>
+                    <li class="list-group-item">截图保存在output_photos目录</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col-md-6">
+                <h3 class="mb-4">应用界面预览</h3>
+                <img src="demo/demo_cover.png" alt="应用界面" class="img-fluid demo-img">
+            </div>
+            <div class="col-md-6">
+                <h3 class="mb-4">操作说明</h3>
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <i class="bi bi-lightbulb me-2"></i>使用技巧
+                    </div>
+                    <div class="card-body">
+                        <ul>
+                            <li>确保光线充足，面部清晰可见，以获得最佳效果</li>
+                            <li>使用全屏模式可以获得更好的视觉体验</li>
+                            <li>录制视频时，可以通过进度条查看录制时间</li>
+                            <li>自定义人脸图片应当包含清晰的正面人脸</li>
+                            <li>如果检测不准确，尝试调整姿势或光线条件</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 项目结构 -->
+    <section class="container mb-5">
+        <h2 class="section-title">项目结构</h2>
+        <div class="code-block">
+            <pre>FaceSwapVideo/
+│
+├── face_swap_ui/           # 项目主要应用程序
+│   ├── output_videos/      # 录制视频保存目录
+│   ├── output_photos/      # 截图保存目录
+│   └── main.py             # 主程序文件
+│
+├── face_photos/            # 预设人脸图片
+│
+├── models/                 # 模型文件目录
+│   └── inswapper_128.onnx  # 人脸交换模型
+│
+├── requirements.txt        # 项目依赖
+└── README.md               # 项目说明文档</pre>
+        </div>
+    </section>
+
+    <!-- 技术实现 -->
+    <section id="tech" class="container mb-5">
+        <h2 class="section-title">技术实现</h2>
+        <p class="lead mb-4">本项目基于以下技术实现：</p>
+        
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="tech-badge">InsightFace</div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="tech-badge">PyQt5</div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="tech-badge">OpenCV</div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="tech-badge">多线程处理</div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">核心技术</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul>
+                            <li><strong>InsightFace</strong>：用于人脸检测和识别，提供高精度的人脸特征提取</li>
+                            <li><strong>PyQt5</strong>：构建图形用户界面，提供丰富的UI组件和事件处理机制</li>
+                            <li><strong>OpenCV</strong>：处理视频流和图像，提供高效的图像处理功能</li>
+                            <li><strong>多线程处理</strong>：使用QThread实现摄像头捕获和处理的并行执行，提高性能</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">实现细节</h4>
+                    </div>
+                    <div class="card-body">
+                        <p>本项目的核心实现包括：</p>
+                        <ol>
+                            <li>使用InsightFace的ONNX模型进行人脸检测和特征提取</li>
+                            <li>通过PyQt5构建用户友好的界面，实现各种交互功能</li>
+                            <li>利用OpenCV处理摄像头视频流，实现实时图像处理</li>
+                            <li>采用多线程架构，将视频捕获和处理分离，提高应用响应速度</li>
+                            <li>实现视频录制和图像保存功能，方便用户分享使用效果</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 常见问题 -->
+    <section id="faq" class="container mb-5">
+        <h2 class="section-title">常见问题</h2>
+        
+        <div class="accordion" id="faqAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                        应用启动时提示"请下载换脸模型并放置在正确位置"
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        <p><strong>解决方案：</strong>从<a href="https://huggingface.co/datasets/Gourieff/ReActor/tree/main/models" target="_blank">Hugging Face</a>下载<code>inswapper_128.onnx</code>模型文件，并放置在<code>models</code>目录下。</p>
+                        <p>确保模型文件名称正确，且放置在正确的目录中。应用程序会在启动时检查该文件是否存在。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingTwo">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                        摄像头无法启动
+                    </button>
+                </h2>
+                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        <p><strong>解决方案：</strong>确保您的摄像头设备正常工作，并且没有被其他应用程序占用。</p>
+                        <ul>
+                            <li>检查摄像头是否已正确连接到计算机</li>
+                            <li>关闭可能正在使用摄像头的其他应用程序</li>
+                            <li>在系统设置中确认摄像头权限已开启</li>
+                            <li>尝试重启应用程序或计算机</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingThree">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                        人脸检测不准确
+                    </button>
+                </h2>
+                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        <p><strong>解决方案：</strong>尝试在光线充足的环境中使用，并确保面部清晰可见。</p>
+                        <ul>
+                            <li>调整光线条件，避免过暗或强光直射</li>
+                            <li>保持面部正对摄像头，减少侧脸角度</li>
+                            <li>避免面部被头发、眼镜等物品遮挡</li>
+                            <li>保持适当距离，不要离摄像头太近或太远</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingFour">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                        应用运行缓慢或卡顿
+                    </button>
+                </h2>
+                <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        <p><strong>解决方案：</strong>检查计算机配置是否满足要求，并关闭不必要的后台程序。</p>
+                        <ul>
+                            <li>关闭其他占用资源的应用程序</li>
+                            <li>降低摄像头分辨率设置</li>
+                            <li>如有NVIDIA显卡，确保已安装最新驱动</li>
+                            <li>考虑升级计算机硬件配置</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 未来计划 -->
+    <section class="container mb-5">
+        <h2 class="section-title">未来计划</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">功能增强</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul>
+                            <li>添加更多预设人脸</li>
+                            <li>优化人脸检测算法，提高准确性</li>
+                            <li>增加更多视频特效</li>
+                            <li>支持批量处理图片和视频文件</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">平台扩展</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul>
+                            <li>开发移动端应用</li>
+                            <li>提供Web版本在线使用</li>
+                            <li>支持更多操作系统平台</li>
+                            <li>增加云端处理能力</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 贡献指南 -->
+    <section class="container mb-5">
+        <h2 class="section-title">贡献指南</h2>
+        <p class="lead">欢迎对本项目做出贡献！您可以通过以下方式参与：</p>
+        
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h4><i class="bi bi-bug me-2 text-danger"></i>提交Bug报告</h4>
+                        <p>如果您发现了任何问题，请通过GitHub Issues提交详细的Bug报告，包括：</p>
+                        <ul>
+                            <li>问题描述</li>
+                            <li>复现步骤</li>
+                            <li>期望行为</li>
+                            <li>实际行为</li>
+                            <li>环境信息（操作系统、Python版本等）</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h4><i class="bi bi-lightbulb me-2 text-warning"></i>提出新功能建议</h4>
+                        <p>如果您有任何新功能的想法，欢迎提出建议：</p>
+                        <ul>
+                            <li>详细描述您的想法</li>
+                            <li>说明该功能可能的使用场景</li>
+                            <li>如果可能，提供一些实现思路</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h4><i class="bi bi-code-slash me-2 text-primary"></i>提交代码改进</h4>
+                        <p>如果您想直接贡献代码，请遵循以下步骤：</p>
+                        <ol>
+                            <li>Fork本仓库</li>
+                            <li>创建您的特性分支</li>
+                            <li>提交您的更改</li>
+                            <li>推送到您的分支</li>
+                            <li>创建Pull Request</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h4><i class="bi bi-file-text me-2 text-success"></i>完善文档</h4>
+                        <p>文档改进对项目同样重要：</p>
+                        <ul>
+                            <li>修正文档中的错误</li>
+                            <li>添加缺失的说明</li>
+                            <li>改进现有文档的清晰度</li>
+                            <li>添加更多示例和使用场景</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 许可证 -->
+    <section class="container mb-5">
+        <h2 class="section-title">许可证</h2>
+        <div class="card">
+            <div class="card-body">
+                <p>本项目采用 MIT 许可证。详情请参阅 <a href="LICENSE">LICENSE</a> 文件。</p>
+                <p>MIT许可证是一个宽松的软件许可证，只要用户在软件和软件的所有副本中都包含了版权声明和许可声明，他们就可以拿你的代码做任何想做的事情，你也无需承担任何责任。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 联系方式 -->
+    <section class="container mb-5">
+        <h2 class="section-title">联系方式</h2>
+        <p class="lead">如有任何问题或建议，请通过以下方式联系我们：</p>
+        
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="bi bi-envelope-fill text-primary" style="font-size: 3rem;"></i>
+                        <h4 class="mt-3">电子邮件</h4>
+                        <p><a href="mailto:1843594674@qq.com">1843594674@qq.com</a></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="bi bi-github text-dark" style="font-size: 3rem;"></i>
+                        <h4 class="mt-3">GitHub Issues</h4>
+                        <p><a href="https://github.com/elon-zz/BigDataCourse-FaceSwapVideo/issues" target="_blank">提交问题</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h4>FaceSwap</h4>
+                    <p>基于深度学习的实时人脸交换应用</p>
+                    <p>&copy; 2023 FaceSwap 团队. 保留所有权利.</p>
+                </div>
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h4>快速链接</h4>
+                    <ul class="list-unstyled">
+                        <li><a href="#features">功能特点</a></li>
+                        <li><a href="#demo">演示效果</a></li>
+                        <li><a href="#installation">安装说明</a></li>
+                        <li><a href="#usage">使用方法</a></li>
+                        <li><a href="#tech">技术实现</a></li>
+                        <li><a href="#faq">常见问题</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h4>相关资源</h4>
+                    <ul class="list-unstyled">
+                        <li><a href="https://github.com/elon-zz/BigDataCourse-FaceSwapVideo" target="_blank">GitHub 仓库</a></li>
+                        <li><a href="https://huggingface.co/datasets/Gourieff/ReActor/tree/main/models" target="_blank">模型下载</a></li>
+                        <li><a href="https://github.com/elon-zz/BigDataCourse-FaceSwapVideo/issues" target="_blank">问题反馈</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        function toggleMenu() {
+            const navbarNav = document.getElementById('navbarNav');
+            navbarNav.classList.toggle('show');
+        }
+        
+        // 手风琴功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const accordionButtons = document.querySelectorAll('.accordion-button');
+            
+            accordionButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const target = document.querySelector(this.getAttribute('data-bs-target'));
+                    
+                    // 关闭所有其他面板
+                    document.querySelectorAll('.accordion-collapse').forEach(collapse => {
+                        if (collapse !== target) {
+                            collapse.classList.remove('show');
+                            const otherButton = document.querySelector(`[data-bs-target="#${collapse.id}"]`);
+                            if (otherButton) otherButton.classList.add('collapsed');
+                        }
+                    });
+                    
+                    // 切换当前面板
+                    this.classList.toggle('collapsed');
+                    target.classList.toggle('show');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
