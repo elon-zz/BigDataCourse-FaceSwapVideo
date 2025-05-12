@@ -18,10 +18,8 @@ FaceSwap是一个基于Python和PyQt5开发的实时人脸交换应用，利用�
 
 ### 视频演示
 
-<video width="640" height="360" controls>
-  <source src="demo/demo_video.mp4" type="video/mp4">
-  您的浏览器不支持视频标签
-</video>
+https://github.com/user-attachments/assets/a5399219-1327-4b59-8a2e-30608559fe56
+
 
 ### 截图展示
 
