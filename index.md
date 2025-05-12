@@ -116,13 +116,13 @@ FaceSwapVideo/
 ## 常见问题
 
 1. **问题**：应用启动时提示"请下载换脸模型并放置在正确位置"
-   **解决方案**：从[Hugging Face](https://huggingface.co/datasets/Gourieff/ReActor/tree/main/models)下载`inswapper_128.onnx`模型文件，并放置在`models`目录下。
+   <br> **解决方案**：从[Hugging Face](https://huggingface.co/datasets/Gourieff/ReActor/tree/main/models)下载`inswapper_128.onnx`模型文件，并放置在`models`目录下。
 
 2. **问题**：摄像头无法启动
-   **解决方案**：确保您的摄像头设备正常工作，并且没有被其他应用程序占用。
+   <br> **解决方案**：确保您的摄像头设备正常工作，并且没有被其他应用程序占用。
 
 3. **问题**：人脸检测不准确
-   **解决方案**：尝试在光线充足的环境中使用，并确保面部清晰可见。
+   <br> **解决方案**：尝试在光线充足的环境中使用，并确保面部清晰可见。
 
 ## 未来计划
 
