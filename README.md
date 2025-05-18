@@ -153,7 +153,7 @@ FaceSwapVideo/
 
 如有任何问题或建议，请通过以下方式联系我们：
 
-- 电子邮件：your.email@example.com
+- 电子邮件：1843594674@qq.com
 - GitHub Issues：[提交问题](https://github.com/elon-zz/BigDataCourse-FaceSwapVideo/issues)
 
 ---
